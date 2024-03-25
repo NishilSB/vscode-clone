@@ -1,5 +1,8 @@
 extern crate walkdir;
-use std::{env, path::PathBuf};
+use std::{
+    env, fs,
+    path::{Path, PathBuf},
+};
 
 use walkdir::WalkDir;
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
@@ -24,7 +27,8 @@ fn get_files_and_folders() -> Vec<PathBuf> {
             Ok(entry) => {
                 // if entry.file_type().is_file() {
                 // Print the file path
-                println!("{}", entry.path().display());
+                // let abs_path = get_absalute_path(entry.path());
+                // println!("{}", abs_path.display());
                 files.push(entry.into_path());
                 // }
             }
@@ -34,6 +38,12 @@ fn get_files_and_folders() -> Vec<PathBuf> {
 
     return files;
 }
+
+// fn get_absalute_path(temp_path: &Path) -> PathBuf {
+//     // let path = env::current_dir().unwrap();
+//     fs::canonicalize(&temp_path).unwrap()
+//     // println!("{}", absolute_path.display());
+// }
 
 fn main() {
     tauri::Builder::default()
