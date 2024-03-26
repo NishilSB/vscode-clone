@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { invoke } from '@tauri-apps/api';
 import './FileExplorer.scss';
+import Folder from './Folder/Folder';
 
 interface FileExplorerProps {}
 interface FileObject {
@@ -53,7 +54,7 @@ const FileExplorer: FC<FileExplorerProps> = () => {
           const newNode = {
             name: part,
             children: [],
-            isFolder: false,
+            isFolder: !part.includes('.'),
             isOpened: false,
             isSelected: false,
           };
@@ -69,55 +70,37 @@ const FileExplorer: FC<FileExplorerProps> = () => {
     return rootNode;
   }
 
-  // const createFileTree = (files: string[]) => {
-  //   let fileTree: Array<FileObject> = [];
-  //   makeChildren(files);
-  //   function makeChildren(files: string[]) {
-  //     let tree = [];
-  //     for (const filePath in files) {
-  //       const element = files[filePath];
-  //       const names = element.split('\\');
-  //       const folder_filename = names[0];
-  //       names.shift();
-  //       const treeObj = {
-  //         children: makeChildren(names),
-  //         folderName: element,
-  //         isFolder: true,
-  //         isOpened: false,
-  //         isSelected: false,
-  //       };
-
-  //       tree.push(treeObj);
-  //       return treeObj;
-  //     }
-  //     console.log('final result', tree);
-  //   }
-  // };
   return (
-    <div className="FileExplorer row-4" data-testid="FileExplorer">
+    <div
+      className="FileExplorer vh-100 overflow-auto"
+      data-testid="FileExplorer"
+    >
       <RenderTree files={treeFiles?.children} />
     </div>
   );
 };
 
 const RenderTree = ({ files }) => {
+  const [expanded, setExpanded] = useState(false);
+  const onFolderFileClick = () => {
+    setExpanded((pre) => !pre);
+  };
   return (
     <div>
-      <ul>
-        {files?.map((d) => (
+      <ul className="p-0">
+        {files?.map(({ name, children, isFolder }) => (
           <>
-            <li>{d?.name}</li>
-            <RenderTree files={d.children} />
+            <li className="list-unstyled" onClick={onFolderFileClick}>
+              <Folder name={name} expanded={expanded} isFolder={isFolder} />
+            </li>
+            <div className="pl-5">
+              {expanded && <RenderTree files={children} />}
+            </div>
           </>
         ))}
       </ul>
     </div>
   );
-  // <li>
-  //   {files?.map((d) => (
-  //     <ul>{d}</ul>
-  //   ))}
-  // </li>;
 };
 
 export default FileExplorer;
